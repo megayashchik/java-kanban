@@ -12,11 +12,10 @@ public class Task {
         this.description = description;
     }
 
-    public Task(String title, String description, TaskStatus status, int id) {
+    public Task(String title, String description, TaskStatus status) {
         this.title = title;
         this.description = description;
         this.status = status;
-        this.id = id;
     }
 
     public int getId() {
@@ -29,6 +28,14 @@ public class Task {
 
     public String getTitle() {
         return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getDescription() {

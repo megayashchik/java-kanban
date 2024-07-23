@@ -41,7 +41,7 @@ public class Main {
         Main.printAllTasks(taskManager);
 
         Task updatedTask1 = new Task("Обновлённая задача 1", "Описание обновлённой задачи 1",
-                TaskStatus.IN_PROGRESS, task1.getId());
+                TaskStatus.IN_PROGRESS);
         taskManager.updateTask(updatedTask1);
 
         Subtask updatedSubtask1 = new Subtask("Обновлённая подзадача 1", "Описание обновлённой подзадачи 1",
