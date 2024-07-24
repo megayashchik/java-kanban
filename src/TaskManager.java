@@ -146,13 +146,17 @@ public class TaskManager {
 
     public void updateEpic(Epic epic) {
         Epic newEpic = epics.get(epic.getId());
-        newEpic.setTitle(epic.getTitle());
-        newEpic.setDescription(epic.getDescription());
+        if (newEpic != null) {
+            newEpic.setTitle(epic.getTitle());
+            newEpic.setDescription(epic.getDescription());
+        } else {
+            System.out.println("Такого эпика не существует");
+        }
     }
 
     public void updateSubtask(Subtask subtask) {
         if (subtasks.containsKey(subtask.getId())) {
-            if (subtasks.containsKey(subtask.getEpicId()) && subtasks.containsKey(subtask.getId())) {
+            if (subtasks.get(subtask.getId()).getEpicId() == subtask.getEpicId()) {
                 subtasks.put(subtask.getId(), subtask);
                 updateStatus(subtask.getEpicId());
             }

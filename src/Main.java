@@ -45,10 +45,10 @@ public class Main {
         taskManager.updateTask(updatedTask1);
 
         Subtask updatedSubtask1 = new Subtask("Обновлённая подзадача 1", "Описание обновлённой подзадачи 1",
-                TaskStatus.IN_PROGRESS, subtask1.getId(), subtask1.getEpicId());
+                TaskStatus.IN_PROGRESS, subtask1.getEpicId());
         taskManager.updateSubtask(updatedSubtask1);
         Subtask updatedSubtask2 = new Subtask("Обновлённая подзадача 2", "Описание обновлённой подзадачи 2",
-                TaskStatus.DONE, subtask2.getId(), subtask2.getEpicId());
+                TaskStatus.DONE, subtask2.getEpicId());
         taskManager.updateSubtask(updatedSubtask2);
 
         System.out.println("\nПосле изменения статуса");
