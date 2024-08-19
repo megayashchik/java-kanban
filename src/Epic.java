@@ -29,12 +29,11 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return getTitle() +  ", " +
+        return getTitle() + ", " +
                 getDescription() + ", " +
                 getStatus() + ", id " +
                 getId();
     }
-
     public void deleteSubtaskId(int id) {
         subtaskIds.remove(Integer.valueOf(id));
     }

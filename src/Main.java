@@ -1,6 +1,7 @@
 public class Main {
 
     private static void printAllTasks(TaskManager taskManager) {
+
         System.out.println("Задачи:");
         for (Task task : taskManager.getTasks()) {
             System.out.println(task);
@@ -9,7 +10,7 @@ public class Main {
         for (Task epic : taskManager.getEpics()) {
             System.out.println(epic);
             for (Task task : taskManager.getSubtasksByEpicId(epic.getId())) {
-                System.out.println("Подзадачи: " + task);
+                System.out.println("   Подзадачи: " + task);
             }
         }
     }
@@ -42,13 +43,16 @@ public class Main {
 
         Task updatedTask1 = new Task("Обновлённая задача 1", "Описание обновлённой задачи 1",
                 TaskStatus.IN_PROGRESS);
+        task1.setStatus(TaskStatus.IN_PROGRESS);
         taskManager.updateTask(updatedTask1);
 
         Subtask updatedSubtask1 = new Subtask("Обновлённая подзадача 1", "Описание обновлённой подзадачи 1",
                 TaskStatus.IN_PROGRESS, subtask1.getEpicId());
+        subtask1.setStatus(TaskStatus.IN_PROGRESS);
         taskManager.updateSubtask(updatedSubtask1);
         Subtask updatedSubtask2 = new Subtask("Обновлённая подзадача 2", "Описание обновлённой подзадачи 2",
                 TaskStatus.DONE, subtask2.getEpicId());
+        subtask2.setStatus(TaskStatus.DONE);
         taskManager.updateSubtask(updatedSubtask2);
 
         System.out.println("\nПосле изменения статуса");

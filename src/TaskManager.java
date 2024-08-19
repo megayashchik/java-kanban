@@ -28,7 +28,7 @@ public class TaskManager {
             subtask.setId(generateId());
             epics.get(subtask.getEpicId()).addSubtaskId(subtask.getId());
             subtasks.put(subtask.getId(), subtask);
-            updateStatus(subtask.getEpicId());
+            updateEpicStatus(subtask.getEpicId());
         } else {
             System.out.println("Такого эпика не существует");
         }
@@ -106,7 +106,7 @@ public class TaskManager {
             int epicId = subtasks.get(id).getEpicId();
             epics.get(epicId).deleteSubtaskId(id);
             subtasks.remove(id);
-            updateStatus(epicId);
+            updateEpicStatus(epicId);
         } else {
             System.out.println("Такой подзадачи не существует");
         }
@@ -132,7 +132,7 @@ public class TaskManager {
     public void deleteAllSubtasks() {
         for (Epic epic : epics.values()) {
             epic.clearSubtaskIds();
-            updateStatus(epic.getId());
+            updateEpicStatus(epic.getId());
         }
         subtasks.clear();
         System.out.println("Список подзадач пуст");
@@ -145,10 +145,10 @@ public class TaskManager {
     }
 
     public void updateEpic(Epic epic) {
-        Epic newEpic = epics.get(epic.getId());
-        if (newEpic != null) {
-            newEpic.setTitle(epic.getTitle());
-            newEpic.setDescription(epic.getDescription());
+        Epic existingEpic = epics.get(epic.getId());
+        if (existingEpic != null) {
+            existingEpic.setTitle(epic.getTitle());
+            existingEpic.setDescription(epic.getDescription());
         } else {
             System.out.println("Такого эпика не существует");
         }
@@ -158,14 +158,14 @@ public class TaskManager {
         if (subtasks.containsKey(subtask.getId())) {
             if (subtasks.get(subtask.getId()).getEpicId() == subtask.getEpicId()) {
                 subtasks.put(subtask.getId(), subtask);
-                updateStatus(subtask.getEpicId());
+                updateEpicStatus(subtask.getEpicId());
             }
         } else {
             System.out.println("Такой подзадачи не существует");
         }
     }
 
-    private void updateStatus(int id) {
+    private void updateEpicStatus(int id) {
         int statusNew = 0;
         int statusDone = 0;
         ArrayList<Integer> subtasksList = epics.get(id).getSubtaskIds();
@@ -185,3 +185,6 @@ public class TaskManager {
         }
     }
 }
+
+
+
