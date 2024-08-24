@@ -1,23 +1,33 @@
+
 public class Main {
 
-    private static void printAllTasks(TaskManager taskManager) {
-
+    private static void printAllTasks(TaskManager manager) {
         System.out.println("Задачи:");
-        for (Task task : taskManager.getTasks()) {
+        for (Task task : manager.getTasks()) {
             System.out.println(task);
         }
         System.out.println("Эпики:");
-        for (Task epic : taskManager.getEpics()) {
+        for (Task epic : manager.getEpics()) {
             System.out.println(epic);
-            for (Task task : taskManager.getSubtasksByEpicId(epic.getId())) {
-                System.out.println("   Подзадачи: " + task);
+
+            for (Task task : manager.getSubtasksByEpicId(epic.getId())) {
+                System.out.println("--> " + task);
             }
+        }
+        System.out.println("Подзадачи:");
+        for (Task subtask : manager.getSubtasks()) {
+            System.out.println(subtask);
+        }
+
+        System.out.println("История:");
+        for (Task task : manager.getHistory()) {
+            System.out.println(task);
         }
     }
 
     public static void main(String[] args) {
 
-        TaskManager taskManager = new TaskManager();
+        TaskManager taskManager = Managers.getDefault();
 
         Task task1 = new Task("Задача 1", "Описание задачи 1");
         Task task2 = new Task("Задача 2", "Описание задачи 2");
@@ -27,8 +37,8 @@ public class Main {
         Epic epic1 = new Epic("Эпик 1", "Описание эпика 1");
         taskManager.createEpic(epic1);
 
-        Subtask subtask1 = new Subtask("Подзадача 1", " Описание подзадачи 1", epic1.getId());
-        Subtask subtask2 = new Subtask("Подзадача 2", " Описание подзадачи 2", epic1.getId());
+        Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1", epic1.getId());
+        Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2", epic1.getId());
 
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
@@ -41,19 +51,14 @@ public class Main {
 
         Main.printAllTasks(taskManager);
 
-        Task updatedTask1 = new Task("Обновлённая задача 1", "Описание обновлённой задачи 1",
-                TaskStatus.IN_PROGRESS);
         task1.setStatus(TaskStatus.IN_PROGRESS);
-        taskManager.updateTask(updatedTask1);
+        taskManager.updateTask(task1);
 
-        Subtask updatedSubtask1 = new Subtask("Обновлённая подзадача 1", "Описание обновлённой подзадачи 1",
-                TaskStatus.IN_PROGRESS, subtask1.getEpicId());
         subtask1.setStatus(TaskStatus.IN_PROGRESS);
-        taskManager.updateSubtask(updatedSubtask1);
-        Subtask updatedSubtask2 = new Subtask("Обновлённая подзадача 2", "Описание обновлённой подзадачи 2",
-                TaskStatus.DONE, subtask2.getEpicId());
+        taskManager.updateSubtask(subtask1);
+
         subtask2.setStatus(TaskStatus.DONE);
-        taskManager.updateSubtask(updatedSubtask2);
+        taskManager.updateSubtask(subtask2);
 
         System.out.println("\nПосле изменения статуса");
         Main.printAllTasks(taskManager);
@@ -62,5 +67,8 @@ public class Main {
         taskManager.deleteTaskById(2);
         taskManager.deleteEpicById(3);
         Main.printAllTasks(taskManager);
+
     }
 }
+
+
