@@ -1,3 +1,10 @@
+package service;
+
+import model.Epic;
+import model.Subtask;
+import model.Task;
+import model.TaskStatus;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,11 +15,7 @@ public class InMemoryTaskManager implements TaskManager {
     private HashMap<Integer, Epic> epics = new HashMap<>();
     private HashMap<Integer, Subtask> subtasks = new HashMap<>();
 
-    private HistoryManager historyManager;
-
-    public InMemoryTaskManager(HistoryManager historyManager) {
-        this.historyManager = historyManager;
-    }
+    private HistoryManager historyManager = Managers.getDefaultHistoryManager();
 
     private int id = 0;
 
@@ -197,8 +200,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    @Override
-    public void updateEpicStatus(int id) {
+    private void updateEpicStatus(int id) {
         int statusNew = 0;
         int statusDone = 0;
         ArrayList<Integer> subtasksList = epics.get(id).getSubtaskIds();
