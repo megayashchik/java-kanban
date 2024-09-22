@@ -103,7 +103,6 @@ public class Main {
         taskManager.deleteEpicById(epic1.getId());
         System.out.println("\nУдаление epic1 с 3 подзадачами:");
         Main.printHistory(taskManager);
-
     }
 }
 
