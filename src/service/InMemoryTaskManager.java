@@ -67,7 +67,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (!tasks.containsKey(id)) {
             System.out.println("Задачи с " + id + " id не существует");
         } else {
-            historyManager.addTask(tasks.get(id));
+            historyManager.addInHistory(tasks.get(id));
         }
         return tasks.get(id);
     }
@@ -77,7 +77,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (!epics.containsKey(id)) {
             System.out.println("Задачи с " + id + " id не существует?");
         } else {
-            historyManager.addTask(epics.get(id));
+            historyManager.addInHistory(epics.get(id));
         }
         return epics.get(id);
     }
@@ -87,7 +87,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (!subtasks.containsKey(id)) {
             System.out.println("Задачи с " + id + " id не существует");
         } else {
-            historyManager.addTask(subtasks.get(id));
+            historyManager.addInHistory(subtasks.get(id));
         }
         return subtasks.get(id);
     }
@@ -111,6 +111,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteTaskById(int id) {
         if (tasks.containsKey(id)) {
             tasks.remove(id);
+            historyManager.removeFromHistory(id);
         } else {
             System.out.println("Задачи с " + id + " id не существует");
         }
@@ -122,8 +123,10 @@ public class InMemoryTaskManager implements TaskManager {
             ArrayList<Integer> subtasksIds = epics.get(id).getSubtaskIds();
             for (Integer subtasksId : subtasksIds) {
                 subtasks.remove(subtasksId);
+                historyManager.removeFromHistory(subtasksId);
             }
             epics.remove(id);
+            historyManager.removeFromHistory(id);
         } else {
             System.out.println("Задачи с " + id + " id не существует");
         }
@@ -136,6 +139,7 @@ public class InMemoryTaskManager implements TaskManager {
             epics.get(epicId).deleteSubtaskId(id);
             subtasks.remove(id);
             updateEpicStatus(epicId);
+            historyManager.removeFromHistory(id);
         } else {
             System.out.println("Такой подзадачи не существует");
         }
@@ -144,6 +148,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllTasks() {
         if (!tasks.isEmpty()) {
+            for (Integer id : tasks.keySet()) {
+                historyManager.removeFromHistory(id);
+            }
+
             tasks.clear();
         } else {
             System.out.println("Список задач пуст");
@@ -153,6 +161,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllEpics() {
         if (!epics.isEmpty()) {
+            for (Integer id : epics.keySet()) {
+                historyManager.removeFromHistory(id);
+            }
+
             subtasks.clear();
             epics.clear();
         } else {
@@ -166,6 +178,11 @@ public class InMemoryTaskManager implements TaskManager {
             epic.clearSubtaskIds();
             updateEpicStatus(epic.getId());
         }
+
+        for (Integer id : subtasks.keySet()) {
+            historyManager.removeFromHistory(id);
+        }
+
         subtasks.clear();
         System.out.println("Список подзадач пуст");
     }
@@ -180,6 +197,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateEpic(Epic epic) {
         Epic existingEpic = epics.get(epic.getId());
+
         if (existingEpic != null) {
             existingEpic.setTitle(epic.getTitle());
             existingEpic.setDescription(epic.getDescription());
@@ -203,6 +221,7 @@ public class InMemoryTaskManager implements TaskManager {
     private void updateEpicStatus(int id) {
         int statusNew = 0;
         int statusDone = 0;
+
         ArrayList<Integer> subtasksList = epics.get(id).getSubtaskIds();
         for (Integer taskId : subtasksList) {
             if (subtasks.get(taskId).getStatus().equals(TaskStatus.DONE)) {
