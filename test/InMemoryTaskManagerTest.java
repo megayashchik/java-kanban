@@ -4,9 +4,9 @@ import model.Task;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.*;
-
-import java.util.List;
+import service.HistoryManager;
+import service.Managers;
+import service.TaskManager;
 
 
 class InMemoryTaskManagerTest {
