@@ -181,7 +181,7 @@ class InMemoryTaskManagerTest {
         taskManager.deleteAllEpics();
 
         Assertions.assertEquals(0, taskManager.getSubtasks().size(), "Не удалось удалить все подзадачи");
-        Assertions.assertNotNull(taskManager.getSubtasks());
+        Assertions.assertNotNull(taskManager.getSubtasks(), "Список задач не должен быть null");
     }
 
     @Test
