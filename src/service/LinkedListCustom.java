@@ -20,11 +20,10 @@ public class LinkedListCustom<T> {
 
         if (tail == null) {
             head = newNode;
-            tail = newNode;
         } else {
             tail.next = newNode;
-            tail = newNode;
         }
+        tail = newNode;
         return newNode;
     }
 
@@ -39,29 +38,28 @@ public class LinkedListCustom<T> {
     }
 
     public void removeNode(Node<Task> node) {
-        if (node == null) {
-            return;
-        }
+        if (node != null) {
 
-        if (node == head) {
-            head = head.next;
-            if (head != null) {
-                head.prev = null;
+            if (node == head) {
+                head = head.next;
+                if (head != null) {
+                    head.prev = null;
+                }
+            } else {
+                if (node.prev != null) {
+                    node.prev.next = node.next;
+                }
             }
-        } else {
-            if (node.prev != null) {
-                node.prev.next = node.next;
-            }
-        }
 
-        if (node == tail) {
-            tail = tail.prev;
-            if (tail != null) {
-                tail.next = null;
-            }
-        } else {
-            if (node.next != null) {
-                node.next.prev = node.prev;
+            if (node == tail) {
+                tail = tail.prev;
+                if (tail != null) {
+                    tail.next = null;
+                }
+            } else {
+                if (node.next != null) {
+                    node.next.prev = node.prev;
+                }
             }
         }
     }

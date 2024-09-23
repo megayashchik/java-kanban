@@ -161,11 +161,14 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllEpics() {
         if (!epics.isEmpty()) {
-            for (Integer id : epics.keySet()) {
-                historyManager.removeFromHistory(id);
+            for (Integer epicId : epics.keySet()) {
+                List<Integer> subtasksIds = epics.get(id).getSubtaskIds();
+                for (Integer subtasksId : subtasksIds) {
+                    subtasks.remove(subtasksId);
+                    historyManager.removeFromHistory(subtasksId);
+                }
+                historyManager.removeFromHistory(epicId);
             }
-
-            subtasks.clear();
             epics.clear();
         } else {
             System.out.println("Список эпиков пуст");
