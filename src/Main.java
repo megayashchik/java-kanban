@@ -31,6 +31,13 @@ public class Main {
         }
     }
 
+    private static void printHistory(TaskManager taskManager) {
+        System.out.println("\nИстория:");
+        for (Task task : taskManager.getHistory()) {
+            System.out.println(task);
+        }
+    }
+
     public static void main(String[] args) {
 
         TaskManager taskManager = Managers.getDefault();
@@ -45,36 +52,60 @@ public class Main {
 
         Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1", epic1.getId());
         Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2", epic1.getId());
+        Subtask subtask3 = new Subtask("Подзадача 3", "Описание подзадачи 3", epic1.getId());
 
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
+        taskManager.createSubtask(subtask3);
 
         Epic epic2 = new Epic("Эпик 2", "Описание эпика 2");
         taskManager.createEpic(epic2);
 
-        Subtask subtask3 = new Subtask("Подзадача 3", "Описание подзадачи 3", epic2.getId());
-        taskManager.createSubtask(subtask3);
-
-        Main.printAllTasks(taskManager);
-
         task1.setStatus(TaskStatus.IN_PROGRESS);
         taskManager.updateTask(task1);
+        task2.setStatus(TaskStatus.NEW);
+        taskManager.updateTask(task2);
 
         subtask1.setStatus(TaskStatus.IN_PROGRESS);
         taskManager.updateSubtask(subtask1);
-
         subtask2.setStatus(TaskStatus.DONE);
         taskManager.updateSubtask(subtask2);
+        subtask3.setStatus(TaskStatus.IN_PROGRESS);
+        taskManager.updateSubtask(subtask3);
 
-        System.out.println("\nПосле изменения статуса");
-        Main.printAllTasks(taskManager);
+        taskManager.getSubtaskById(subtask2.getId());
+        taskManager.getEpicById(epic2.getId());
+        taskManager.getTaskById(task1.getId());
+        taskManager.getSubtaskById(subtask1.getId());
+        taskManager.getSubtaskById(subtask3.getId());
+        taskManager.getEpicById(epic1.getId());
+        taskManager.getTaskById(task2.getId());
 
-        System.out.println("\nПосле удаления");
-        taskManager.deleteTaskById(2);
-        taskManager.deleteEpicById(3);
-        Main.printAllTasks(taskManager);
+        Main.printHistory(taskManager);
 
+        taskManager.getSubtaskById(subtask2.getId());
+        taskManager.getEpicById(epic2.getId());
+        taskManager.getTaskById(task1.getId());
+        taskManager.getSubtaskById(subtask1.getId());
+        taskManager.getSubtaskById(subtask3.getId());
+        taskManager.getSubtaskById(subtask1.getId());
+        taskManager.getSubtaskById(subtask3.getId());
+        taskManager.getEpicById(epic1.getId());
+        taskManager.getTaskById(task2.getId());
+
+        System.out.println("\nПроверка повторов:");
+        Main.printHistory(taskManager);
+
+        taskManager.deleteTaskById(task2.getId());
+        System.out.println("\nПосле удаления task2");
+        Main.printHistory(taskManager);
+
+        taskManager.deleteEpicById(epic1.getId());
+        System.out.println("\nУдаление epic1 с 3 подзадачами:");
+        Main.printHistory(taskManager);
     }
 }
+
+
 
 
