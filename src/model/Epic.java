@@ -11,8 +11,16 @@ public class Epic extends Task {
         super(title, description);
     }
 
+    public Epic(String title, String description, int id, TaskStatus status) {
+        super(title, description, id, status);
+    }
+
     public ArrayList<Integer> getSubtaskIds() {
         return new ArrayList<>(subtaskIds);
+    }
+
+    public TaskType getType() {
+        return TaskType.EPIC;
     }
 
     @Override

@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 public class LinkedListCustom<T> {
 
     private Node<Task> head;
@@ -28,7 +27,7 @@ public class LinkedListCustom<T> {
     }
 
     public List<Task> getTasks() {
-        List<Task> listOfTasks =  new ArrayList<>();
+        List<Task> listOfTasks = new ArrayList<>();
         Node<Task> node = head;
         while (node != null) {
             listOfTasks.add(node.task);

@@ -1,12 +1,17 @@
 import model.Epic;
 import model.Subtask;
 import model.Task;
+import model.TaskStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.HistoryManager;
+import service.InMemoryTaskManager;
 import service.Managers;
 import service.TaskManager;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 
 class InMemoryTaskManagerTest {
@@ -211,7 +216,7 @@ class InMemoryTaskManagerTest {
         task2.setId(1);
 
         Assertions.assertEquals(task1, task2);
-}
+    }
 
     @Test
     void checkIfInheritorsOfTasksAreEqualWithTheSameId() {
@@ -270,6 +275,29 @@ class InMemoryTaskManagerTest {
         Assertions.assertEquals(task.getDescription(), checkedTask.getDescription());
         Assertions.assertEquals(task.getId(), checkedTask.getId());
         Assertions.assertEquals(task, checkedTask, "Задачи не равны");
+    }
+
+    @Test
+    public void createSubtaskWithNonExistentEpic() {
+        InMemoryTaskManager taskManager = new InMemoryTaskManager();
+
+        Subtask subtask = new Subtask("Подзадача", "Описание подзадачи", 1, TaskStatus.NEW, 55);
+
+        taskManager.createSubtask(subtask);
+
+        assertNull(taskManager.getSubtasksByEpicId(1));
+    }
+
+    @Test
+    public void createSubtaskWithExistentEpic() {
+        InMemoryTaskManager taskManager = new InMemoryTaskManager();
+
+        Epic epic = new Epic("Эпик", "Описание эпика", 1, TaskStatus.NEW);
+        taskManager.createEpic(epic);
+        Subtask subtask = new Subtask("Подзадача", "Описание подзадачи", 2, TaskStatus.NEW, 1);
+        taskManager.createSubtask(subtask);
+
+        assertNotNull(taskManager.getSubtasksByEpicId(1));
     }
 }
 

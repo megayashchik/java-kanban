@@ -75,7 +75,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Epic getEpicById(int id) {
         if (!epics.containsKey(id)) {
-            System.out.println("Задачи с " + id + " id не существует?");
+            System.out.println("Задачи с " + id + " id не существует");
         } else {
             historyManager.addInHistory(epics.get(id));
         }
@@ -233,7 +233,7 @@ public class InMemoryTaskManager implements TaskManager {
                 statusNew++;
             }
         }
-        if (subtasksList.size() == statusNew  || subtasksList.isEmpty()) {
+        if (subtasksList.size() == statusNew || subtasksList.isEmpty()) {
             epics.get(id).setStatus(TaskStatus.NEW);
         } else if (subtasksList.size() == statusDone) {
             epics.get(id).setStatus(TaskStatus.DONE);
