@@ -10,6 +10,7 @@ import service.FileBackedTaskManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,8 +32,19 @@ public class FileBackedTaskManagerTest {
     }
 
     @Test
-    public void shouldSaveAndLoadEmptyFile() {
-        manager.save();
+    public void shouldCreateAndSaveTask() {
+        Task task = new Task("Задача", "Описание задачи");
+        manager.createTask(task);
+
+        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
+        List<Task> loadedTasks = loadedManager.getTasks();
+
+        assertEquals(1, loadedTasks.size(), "Должна быть одна задача после загрузки");
+        assertEquals(task, loadedTasks.get(0), "Загруженная задача должна совпадать с исходной");
+    }
+
+    @Test
+    public void shouldLoadEmptyFile() {
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
 
         assertTrue(loadedManager.getTasks().isEmpty(), "Список задач должен быть пуст");
@@ -41,18 +53,58 @@ public class FileBackedTaskManagerTest {
     }
 
     @Test
-    public void shouldSaveMultipleTasks() {
-        Task task1 = new Task("Задача 1", "Описание задачи 1");
-        Task task2 = new Task("Задача 2", "Описание задачи 2");
-        manager.createTask(task1);
-        manager.createTask(task2);
-        manager.save();
+    public void shouldSetCorrectIdAfterCreateAndSave() {
+        Task task = new Task("Задача", "Описание задачи");
+        manager.createTask(task);
+        int expectedId = task.getId();
 
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
+        Task loadedTask = loadedManager.getTaskById(expectedId);
 
-        assertEquals(2, loadedManager.getTasks().size(), "Должно быть 2 задачи.");
-        assertTrue(loadedManager.getTasks().contains(task1), "Загруженный менеджер должен содержать Задача 1");
-        assertTrue(loadedManager.getTasks().contains(task2), "Загруженный менеджер должен содержать Задача 2");
+        assertNotNull(loadedTask, "Задача должна быть загружена из файла");
+        assertEquals(expectedId, loadedTask.getId(),
+                "ID задачи после загрузки должен совпадать с ожидаемым ID");
+    }
+
+    @Test
+    public void testUpdateAndSaveTask() {
+        Task task = new Task("Задача", "Описание задачи");
+        manager.createTask(task);
+        task.setTitle("Обновленная Задача");
+        manager.updateTask(task);
+
+        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
+        Task loadedTask = loadedManager.getTaskById(task.getId());
+
+        assertEquals("Обновленная Задача", loadedTask.getTitle(),
+                "Загруженная задача должна иметь обновленное название");
+    }
+
+    @Test
+    public void testDeleteAndSaveTask() {
+        Task task = new Task("Задача", "Описание задачи");
+        manager.createTask(task);
+        manager.deleteTaskById(task.getId());
+
+        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
+        assertNull(loadedManager.getTaskById(task.getId()), "Задача должна быть удалена после загрузки");
+    }
+
+    @Test
+    public void shouldSaveAndLoadEpicWithSubtasks() {
+        Epic epic = new Epic("Эпик", "Описание эпика");
+        manager.createEpic(epic);
+        Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1", epic.getId());
+        Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2", epic.getId());
+        manager.createSubtask(subtask1);
+        manager.createSubtask(subtask2);
+
+        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
+        List<Epic> loadedEpics = loadedManager.getEpics();
+        List<Subtask> loadedSubtasks = loadedManager.getSubtasksByEpicId(epic.getId());
+
+        assertEquals(1, loadedEpics.size(), "Должен быть один эпик после загрузки");
+        assertEquals(2, loadedSubtasks.size(), "Должно быть две подзадачи после загрузки");
     }
 
     @Test
