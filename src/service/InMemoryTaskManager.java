@@ -11,13 +11,13 @@ import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    private HashMap<Integer, Task> tasks = new HashMap<>();
-    private HashMap<Integer, Epic> epics = new HashMap<>();
-    private HashMap<Integer, Subtask> subtasks = new HashMap<>();
+    protected HashMap<Integer, Task> tasks = new HashMap<>();
+    protected HashMap<Integer, Epic> epics = new HashMap<>();
+    protected HashMap<Integer, Subtask> subtasks = new HashMap<>();
 
-    private HistoryManager historyManager = Managers.getDefaultHistoryManager();
+    protected HistoryManager historyManager = Managers.getDefaultHistoryManager();
 
-    private int id = 0;
+    protected int id = 0;
 
     private int generateId() {
         return ++id;
@@ -44,6 +44,32 @@ public class InMemoryTaskManager implements TaskManager {
             updateEpicStatus(subtask.getEpicId());
         } else {
             System.out.println("Такого эпика не существует");
+        }
+    }
+
+    private void updateIdAfterLoad(int loadedId) {
+        if (loadedId > id) {
+            id = loadedId;
+        }
+    }
+
+    protected void addTask(Task task) {
+        tasks.put(task.getId(), task);
+        updateIdAfterLoad(task.getId());
+    }
+
+    protected void addEpic(Epic epic) {
+        epics.put(epic.getId(), epic);
+        updateIdAfterLoad(epic.getId());
+    }
+
+    protected void addSubtask(Subtask subtask) {
+        subtasks.put(subtask.getId(), subtask);
+        updateIdAfterLoad(subtask.getId());
+
+        if (epics.containsKey(subtask.getId())) {
+            epics.get(subtask.getEpicId()).addSubtaskId(subtask.getId());
+            updateEpicStatus(subtask.getEpicId());
         }
     }
 
@@ -75,7 +101,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Epic getEpicById(int id) {
         if (!epics.containsKey(id)) {
-            System.out.println("Задачи с " + id + " id не существует?");
+            System.out.println("Задачи с " + id + " id не существует");
         } else {
             historyManager.addInHistory(epics.get(id));
         }
@@ -233,7 +259,7 @@ public class InMemoryTaskManager implements TaskManager {
                 statusNew++;
             }
         }
-        if (subtasksList.size() == statusNew  || subtasksList.isEmpty()) {
+        if (subtasksList.size() == statusNew || subtasksList.isEmpty()) {
             epics.get(id).setStatus(TaskStatus.NEW);
         } else if (subtasksList.size() == statusDone) {
             epics.get(id).setStatus(TaskStatus.DONE);

@@ -6,7 +6,6 @@ import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-
     private final LinkedListCustom history = new LinkedListCustom();
 
     @Override
