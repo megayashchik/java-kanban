@@ -1,316 +1,316 @@
-//import model.Epic;
-//import model.Subtask;
-//import model.Task;
-//import model.TaskStatus;
-//import org.junit.jupiter.api.Assertions;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import service.HistoryManager;
-//import service.InMemoryTaskManager;
-//import service.Managers;
-//import service.TaskManager;
-//
-//import java.time.Duration;
-//import java.time.LocalDateTime;
-//
-//import static org.junit.jupiter.api.Assertions.assertNotNull;
-//
-//
-//class InMemoryTaskManagerTest {
-//
-//    private TaskManager taskManager;
-//    private HistoryManager historyManager;
-//
-//    @BeforeEach
-//    void init() {
-//        taskManager = Managers.getDefault();
-//        historyManager = Managers.getDefaultHistoryManager();
-//    }
-//
+import model.Epic;
+import model.Subtask;
+import model.Task;
+import model.TaskStatus;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import service.HistoryManager;
+import service.InMemoryTaskManager;
+import service.Managers;
+import service.TaskManager;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+
+class InMemoryTaskManagerTest {
+
+    private TaskManager taskManager;
+    private HistoryManager historyManager;
+
+    @BeforeEach
+    void init() {
+        taskManager = Managers.getDefault();
+        historyManager = Managers.getDefaultHistoryManager();
+    }
+
+    @Test
+    void createNewTask_shouldSaveTask() {
+        Task task = new Task("Задача_1", "Описание_1");
+
+        taskManager.createTask(task);
+        Task actualTask = taskManager.getTaskById(task.getId());
+
+        Assertions.assertNotNull(actualTask, "Задача не была сохранена");
+        Assertions.assertEquals(task, actualTask);
+    }
+
+    @Test
+    void updateTask_shouldUpdateTaskWithSpecifiedTitleAndDescription() {
+        Task task = new Task("Задача_1", "Описание_1");
+
+        taskManager.createTask(task);
+        Task savedTask = taskManager.getTaskById(task.getId());
+        savedTask.setTitle("Задача_1_Updated");
+        savedTask.setDescription("Описание_1_Updated");
+        taskManager.updateTask(savedTask);
+        Task actualUpdatedTask = taskManager.getTaskById(task.getId());
+
+        Assertions.assertEquals(task, actualUpdatedTask);
+    }
+
+    @Test
+    void deleteTaskById_shouldDeleteTask() {
+        Task task = new Task("Задача_1", "Описание_1");
+
+        taskManager.createTask(task);
+        Task actualTask = taskManager.getTaskById(task.getId());
+        Assertions.assertEquals(task, actualTask);
+        taskManager.deleteTaskById(task.getId());
+        Task deletedTask = taskManager.getTaskById(task.getId());
+
+        Assertions.assertNull(deletedTask, "Задача с " + task.getId() + " id не удалена");
+    }
+
+    @Test
+    void deleteAllTasks_shouldDeleteAllTasks() {
+        Task task1 = new Task("Задача_1", "Описание_1");
+        Task task2 = new Task("Задача_2", "Описание_2");
+
+        taskManager.createTask(task1);
+        taskManager.createTask(task2);
+        taskManager.deleteAllTasks();
+
+        Assertions.assertEquals(0, taskManager.getTasks().size(), "Не удалось удалить все задачи");
+        Assertions.assertNotNull(taskManager.getTasks());
+    }
+
+    @Test
+    void createNewEpic_shouldSaveEpic() {
+        Epic epic = new Epic("Эпик_1", "Описание_1");
+
+        taskManager.createEpic(epic);
+        Epic actualEpic = taskManager.getEpicById(epic.getId());
+
+        Assertions.assertNotNull(actualEpic, "Эпик не был сохранен");
+        Assertions.assertEquals(epic, actualEpic);
+    }
+
+    @Test
+    void updateEpic_shouldUpdateEpicWithSpecifiedTitleAndDescription() {
+        Epic epic = new Epic("Эпик_1", "Описание_1");
+
+        taskManager.createEpic(epic);
+        Epic savedEpic = taskManager.getEpicById(epic.getId());
+        savedEpic.setTitle("Эпик_1_Updated");
+        savedEpic.setDescription("Описание_1_Updated");
+        taskManager.updateEpic(savedEpic);
+        Epic actualUpdatedEpic = taskManager.getEpicById(epic.getId());
+
+        Assertions.assertEquals(epic, actualUpdatedEpic);
+    }
+
+    @Test
+    void deleteEpicById_shouldDeleteEpic() {
+        Epic epic = new Epic("Эпик_1", "Описание_1");
+
+        taskManager.createEpic(epic);
+        Epic actualEpic = taskManager.getEpicById(epic.getId());
+        Assertions.assertEquals(epic, actualEpic);
+        taskManager.deleteEpicById(epic.getId());
+        Epic deletedEpic = taskManager.getEpicById(epic.getId());
+
+        Assertions.assertNull(deletedEpic, "Эпик с " + epic.getId() + " id не удалён");
+    }
+
+    @Test
+    void deleteAllEpics_shouldDeleteAllEpics() {
+        Epic epic1 = new Epic("Эпик_1", "Описание_1");
+        Epic epic2 = new Epic("Эпик_2", "Описание_2");
+
+        taskManager.createEpic(epic1);
+        taskManager.createEpic(epic2);
+        taskManager.deleteAllEpics();
+
+        Assertions.assertEquals(0, taskManager.getEpics().size(), "Не удалось удалить все эпики");
+        Assertions.assertNotNull(taskManager.getEpics());
+    }
+
+    @Test
+    void createNewSubtask_shouldSaveSubtask() {
+        Epic epic = new Epic("Эпик_1", "Описание_1");
+        taskManager.createEpic(epic);
+        Subtask subtask = new Subtask("Подзадача_1", "Описание_1", epic.getId(),
+                LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
+
+        taskManager.createSubtask(subtask);
+        Subtask actualSubtask = taskManager.getSubtaskById(subtask.getId());
+
+        Assertions.assertNotNull(actualSubtask, "Подзадача не была сохранена");
+        Assertions.assertEquals(subtask, actualSubtask);
+    }
+
 //    @Test
-//    void createNewTask_shouldSaveTask() {
-//        Task task = new Task("Задача_1", "Описание_1");
-//
-//        taskManager.createTask(task);
-//        Task actualTask = taskManager.getTaskById(task.getId());
-//
-//        Assertions.assertNotNull(actualTask, "Задача не была сохранена");
-//        Assertions.assertEquals(task, actualTask);
-//    }
-//
-//    @Test
-//    void updateTask_shouldUpdateTaskWithSpecifiedTitleAndDescription() {
-//        Task task = new Task("Задача_1", "Описание_1");
-//
-//        taskManager.createTask(task);
-//        Task savedTask = taskManager.getTaskById(task.getId());
-//        savedTask.setTitle("Задача_1_Updated");
-//        savedTask.setDescription("Описание_1_Updated");
-//        taskManager.updateTask(savedTask);
-//        Task actualUpdatedTask = taskManager.getTaskById(task.getId());
-//
-//        Assertions.assertEquals(task, actualUpdatedTask);
-//    }
-//
-//    @Test
-//    void deleteTaskById_shouldDeleteTask() {
-//        Task task = new Task("Задача_1", "Описание_1");
-//
-//        taskManager.createTask(task);
-//        Task actualTask = taskManager.getTaskById(task.getId());
-//        Assertions.assertEquals(task, actualTask);
-//        taskManager.deleteTaskById(task.getId());
-//        Task deletedTask = taskManager.getTaskById(task.getId());
-//
-//        Assertions.assertNull(deletedTask, "Задача с " + task.getId() + " id не удалена");
-//    }
-//
-//    @Test
-//    void deleteAllTasks_shouldDeleteAllTasks() {
-//        Task task1 = new Task("Задача_1", "Описание_1");
-//        Task task2 = new Task("Задача_2", "Описание_2");
-//
-//        taskManager.createTask(task1);
-//        taskManager.createTask(task2);
-//        taskManager.deleteAllTasks();
-//
-//        Assertions.assertEquals(0, taskManager.getTasks().size(), "Не удалось удалить все задачи");
-//        Assertions.assertNotNull(taskManager.getTasks());
-//    }
-//
-//    @Test
-//    void createNewEpic_shouldSaveEpic() {
-//        Epic epic = new Epic("Эпик_1", "Описание_1");
-//
-//        taskManager.createEpic(epic);
-//        Epic actualEpic = taskManager.getEpicById(epic.getId());
-//
-//        Assertions.assertNotNull(actualEpic, "Эпик не был сохранен");
-//        Assertions.assertEquals(epic, actualEpic);
-//    }
-//
-//    @Test
-//    void updateEpic_shouldUpdateEpicWithSpecifiedTitleAndDescription() {
-//        Epic epic = new Epic("Эпик_1", "Описание_1");
-//
-//        taskManager.createEpic(epic);
-//        Epic savedEpic = taskManager.getEpicById(epic.getId());
-//        savedEpic.setTitle("Эпик_1_Updated");
-//        savedEpic.setDescription("Описание_1_Updated");
-//        taskManager.updateEpic(savedEpic);
-//        Epic actualUpdatedEpic = taskManager.getEpicById(epic.getId());
-//
-//        Assertions.assertEquals(epic, actualUpdatedEpic);
-//    }
-//
-//    @Test
-//    void deleteEpicById_shouldDeleteEpic() {
-//        Epic epic = new Epic("Эпик_1", "Описание_1");
-//
-//        taskManager.createEpic(epic);
-//        Epic actualEpic = taskManager.getEpicById(epic.getId());
-//        Assertions.assertEquals(epic, actualEpic);
-//        taskManager.deleteEpicById(epic.getId());
-//        Epic deletedEpic = taskManager.getEpicById(epic.getId());
-//
-//        Assertions.assertNull(deletedEpic, "Эпик с " + epic.getId() + " id не удалён");
-//    }
-//
-//    @Test
-//    void deleteAllEpics_shouldDeleteAllEpics() {
-//        Epic epic1 = new Epic("Эпик_1", "Описание_1");
-//        Epic epic2 = new Epic("Эпик_2", "Описание_2");
-//
-//        taskManager.createEpic(epic1);
-//        taskManager.createEpic(epic2);
-//        taskManager.deleteAllEpics();
-//
-//        Assertions.assertEquals(0, taskManager.getEpics().size(), "Не удалось удалить все эпики");
-//        Assertions.assertNotNull(taskManager.getEpics());
-//    }
-//
-//    @Test
-//    void createNewSubtask_shouldSaveSubtask() {
-//        Epic epic = new Epic("Эпик_1", "Описание_1");
-//        taskManager.createEpic(epic);
-//        Subtask subtask = new Subtask("Подзадача_1", "Описание_1", epic.getId(),
-//                LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
-//
-//        taskManager.createSubtask(subtask);
-//        Subtask actualSubtask = taskManager.getSubtaskById(subtask.getId());
-//
-//        Assertions.assertNotNull(actualSubtask, "Подзадача не была сохранена");
-//        Assertions.assertEquals(subtask, actualSubtask);
-//    }
-//
-////    @Test
-////    void updateSubtask_shouldUpdateSubtaskWithSpecifiedTitleAndDescription() {
-////        Epic epic = new Epic("Эпик_1", "Описание_1");
-////        taskManager.createEpic(epic);
-////        Subtask subtask = new Subtask("Подзадача_1", "Описание_1", epic.getId(),
-////                LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
-////
-////        taskManager.createSubtask(subtask);
-////        Subtask savedSubtask = taskManager.getSubtaskById(subtask.getId());
-////        savedSubtask.setTitle("Подзадача_1_Updated");
-////        savedSubtask.setDescription("Описание_1_Updated");
-////        taskManager.updateSubtask(savedSubtask);
-////        Subtask actualUpdatedSubtask = taskManager.getSubtaskById(subtask.getId());
-////
-////        Assertions.assertNotNull(actualUpdatedSubtask);
-////        Assertions.assertEquals("Подзадача_1_Updated", actualUpdatedSubtask.getTitle());
-////        Assertions.assertEquals("Описание_1_Updated", actualUpdatedSubtask.getDescription());
-////        Assertions.assertEquals(subtask, actualUpdatedSubtask);
-////    }
-//
-//    @Test
-//    void deleteSubtaskById_shouldDeleteSubtask() {
+//    void updateSubtask_shouldUpdateSubtaskWithSpecifiedTitleAndDescription() {
 //        Epic epic = new Epic("Эпик_1", "Описание_1");
 //        taskManager.createEpic(epic);
 //        Subtask subtask = new Subtask("Подзадача_1", "Описание_1", epic.getId(),
 //                LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
 //
 //        taskManager.createSubtask(subtask);
+//        Subtask savedSubtask = taskManager.getSubtaskById(subtask.getId());
+//        savedSubtask.setTitle("Подзадача_1_Updated");
+//        savedSubtask.setDescription("Описание_1_Updated");
+//        taskManager.updateSubtask(savedSubtask);
 //        Subtask actualUpdatedSubtask = taskManager.getSubtaskById(subtask.getId());
+//
+//        Assertions.assertNotNull(actualUpdatedSubtask);
+//        Assertions.assertEquals("Подзадача_1_Updated", actualUpdatedSubtask.getTitle());
+//        Assertions.assertEquals("Описание_1_Updated", actualUpdatedSubtask.getDescription());
 //        Assertions.assertEquals(subtask, actualUpdatedSubtask);
-//        taskManager.deleteSubtaskById(subtask.getId());
-//        Subtask deletedSubtask = taskManager.getSubtaskById(subtask.getId());
-//
-//        Assertions.assertNull(deletedSubtask, "Подзадача с " + subtask.getId() + " id не удалёна");
 //    }
-//
+
+    @Test
+    void deleteSubtaskById_shouldDeleteSubtask() {
+        Epic epic = new Epic("Эпик_1", "Описание_1");
+        taskManager.createEpic(epic);
+        Subtask subtask = new Subtask("Подзадача_1", "Описание_1", epic.getId(),
+                LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
+
+        taskManager.createSubtask(subtask);
+        Subtask actualUpdatedSubtask = taskManager.getSubtaskById(subtask.getId());
+        Assertions.assertEquals(subtask, actualUpdatedSubtask);
+        taskManager.deleteSubtaskById(subtask.getId());
+        Subtask deletedSubtask = taskManager.getSubtaskById(subtask.getId());
+
+        Assertions.assertNull(deletedSubtask, "Подзадача с " + subtask.getId() + " id не удалёна");
+    }
+
+    @Test
+    void deleteAllSubtasks_shouldDeleteAllSubtasks() {
+        Epic epic = new Epic("Эпик_1", "Описание_1");
+        taskManager.createEpic(epic);
+        Subtask subtask1 = new Subtask("Подзадача_1", "Описание_1", epic.getId(),
+                LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
+        Subtask subtask2 = new Subtask("Подзадача_2", "Описание_2", epic.getId(),
+                LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
+
+        taskManager.createSubtask(subtask1);
+        taskManager.createSubtask(subtask2);
+        taskManager.deleteAllEpics();
+
+        Assertions.assertEquals(0, taskManager.getSubtasks().size(), "Не удалось удалить все подзадачи");
+        Assertions.assertNotNull(taskManager.getSubtasks(), "Список задач не должен быть null");
+    }
+
 //    @Test
-//    void deleteAllSubtasks_shouldDeleteAllSubtasks() {
-//        Epic epic = new Epic("Эпик_1", "Описание_1");
-//        taskManager.createEpic(epic);
-//        Subtask subtask1 = new Subtask("Подзадача_1", "Описание_1", epic.getId(),
-//                LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
-//        Subtask subtask2 = new Subtask("Подзадача_2", "Описание_2", epic.getId(),
-//                LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
-//
-//        taskManager.createSubtask(subtask1);
-//        taskManager.createSubtask(subtask2);
-//        taskManager.deleteAllEpics();
-//
-//        Assertions.assertEquals(0, taskManager.getSubtasks().size(), "Не удалось удалить все подзадачи");
-//        Assertions.assertNotNull(taskManager.getSubtasks(), "Список задач не должен быть null");
-//    }
-//
-////    @Test
-////    void updateSubtask_shouldUpdateSubtaskWithSpecifiedId() { // изменить на status
-////        Epic epic = new Epic("Эпик_1", "Описание_1");
-////        taskManager.createEpic(epic);
-////        Subtask subtask = new Subtask("Подзадача_1", "Описание_1", epic.getId(),
-////                LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
-////
-////        taskManager.createSubtask(subtask);
-////        subtask.setTitle("Подзадача_1_Updated");
-////        subtask.setDescription("Описание_1_Updated");
-////        taskManager.updateSubtask(subtask);
-////
-////        Subtask expectedUpdatedSubtask = new Subtask("Подзадача_1_Updated", "Описание_1_Updated",
-////                subtask.getEpicId(), LocalDateTime.of(2024, 10, 20, 14, 30),
-////                Duration.ofMinutes(100));
-////        expectedUpdatedSubtask.setId(subtask.getId());
-////        Subtask actualUpdatedSubtask = taskManager.getSubtaskById(subtask.getId());
-////
-////        Assertions.assertEquals(expectedUpdatedSubtask, actualUpdatedSubtask);
-////    }
-//
-//    @Test
-//    void checkIfTasksAreEqualWithTheSameId() {
-//        Task task1 = new Task("Задача_1", "Описание_1");
-//        Task task2 = new Task("Задача_1", "Описание_1");
-//
-//        task1.setId(1);
-//        task2.setId(1);
-//
-//        Assertions.assertEquals(task1, task2);
-//    }
-//
-//    @Test
-//    void checkIfInheritorsOfTasksAreEqualWithTheSameId() {
-//        Epic epic1 = new Epic("Эпик_1", "Описание_1");
-//        Epic epic2 = new Epic("Эпик_1", "Описание_1");
-//
-//        epic1.setId(1);
-//        epic2.setId(1);
-//
-//        Assertions.assertEquals(epic1, epic2);
-//    }
-//
-//    @Test
-//    void taskManagerAlwaysReturnInitializedInstancesOfManagers() {
-//        TaskManager manager = Managers.getDefault();
-//        Assertions.assertNotNull(manager);
-//    }
-//
-//    @Test
-//    void checkIfInMemoryTaskManagerAddDifferentTypesOfTask() {
-//        Task task = new Task("Задача_1", "Описание_1");
+//    void updateSubtask_shouldUpdateSubtaskWithSpecifiedId() { // изменить на status
 //        Epic epic = new Epic("Эпик_1", "Описание_1");
 //        taskManager.createEpic(epic);
 //        Subtask subtask = new Subtask("Подзадача_1", "Описание_1", epic.getId(),
 //                LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
 //
-//        taskManager.createTask(task);
 //        taskManager.createSubtask(subtask);
+//        subtask.setTitle("Подзадача_1_Updated");
+//        subtask.setDescription("Описание_1_Updated");
+//        taskManager.updateSubtask(subtask);
 //
-//        Assertions.assertEquals(task, taskManager.getTaskById(task.getId()));
-//        Assertions.assertEquals(epic, taskManager.getEpicById(epic.getId()));
-//        Assertions.assertEquals(subtask, taskManager.getSubtaskById(subtask.getId()));
+//        Subtask expectedUpdatedSubtask = new Subtask("Подзадача_1_Updated", "Описание_1_Updated",
+//                subtask.getEpicId(), LocalDateTime.of(2024, 10, 20, 14, 30),
+//                Duration.ofMinutes(100));
+//        expectedUpdatedSubtask.setId(subtask.getId());
+//        Subtask actualUpdatedSubtask = taskManager.getSubtaskById(subtask.getId());
+//
+//        Assertions.assertEquals(expectedUpdatedSubtask, actualUpdatedSubtask);
 //    }
-//
+
+    @Test
+    void checkIfTasksAreEqualWithTheSameId() {
+        Task task1 = new Task("Задача_1", "Описание_1");
+        Task task2 = new Task("Задача_1", "Описание_1");
+
+        task1.setId(1);
+        task2.setId(1);
+
+        Assertions.assertEquals(task1, task2);
+    }
+
+    @Test
+    void checkIfInheritorsOfTasksAreEqualWithTheSameId() {
+        Epic epic1 = new Epic("Эпик_1", "Описание_1");
+        Epic epic2 = new Epic("Эпик_1", "Описание_1");
+
+        epic1.setId(1);
+        epic2.setId(1);
+
+        Assertions.assertEquals(epic1, epic2);
+    }
+
+    @Test
+    void taskManagerAlwaysReturnInitializedInstancesOfManagers() {
+        TaskManager manager = Managers.getDefault();
+        Assertions.assertNotNull(manager);
+    }
+
+    @Test
+    void checkIfInMemoryTaskManagerAddDifferentTypesOfTask() {
+        Task task = new Task("Задача_1", "Описание_1");
+        Epic epic = new Epic("Эпик_1", "Описание_1");
+        taskManager.createEpic(epic);
+        Subtask subtask = new Subtask("Подзадача_1", "Описание_1", epic.getId(),
+                LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
+
+        taskManager.createTask(task);
+        taskManager.createSubtask(subtask);
+
+        Assertions.assertEquals(task, taskManager.getTaskById(task.getId()));
+        Assertions.assertEquals(epic, taskManager.getEpicById(epic.getId()));
+        Assertions.assertEquals(subtask, taskManager.getSubtaskById(subtask.getId()));
+    }
+
+    @Test
+    void checkThatTasksWithTheSpecifiedIdDoNotConflictWithGeneratedId() {
+        Task taskWithGeneratedId = new Task("Задача_1", "Описание_1");
+        Task taskWithSpecifiedId = new Task("Задача_2", "Описание_2");
+
+        taskManager.createTask(taskWithGeneratedId);
+        taskWithSpecifiedId.setId(4);
+        taskManager.createTask(taskWithSpecifiedId);
+
+        Assertions.assertEquals(taskWithGeneratedId, taskManager.getTaskById(taskWithGeneratedId.getId()));
+        Assertions.assertEquals(taskWithSpecifiedId, taskManager.getTaskById(taskWithSpecifiedId.getId()));
+        Assertions.assertNotEquals(taskWithGeneratedId.getId(), taskWithSpecifiedId.getId());
+    }
+
+    @Test
+    void checkIfTaskUnchangedWhenAddToManager() {
+        Task task = new Task("Задача_1", "Описание_1");
+
+        taskManager.createTask(task);
+        Task checkedTask = taskManager.getTaskById(task.getId());
+
+        Assertions.assertEquals(task.getTitle(), checkedTask.getTitle());
+        Assertions.assertEquals(task.getDescription(), checkedTask.getDescription());
+        Assertions.assertEquals(task.getId(), checkedTask.getId());
+        Assertions.assertEquals(task, checkedTask, "Задачи не равны");
+    }
+
 //    @Test
-//    void checkThatTasksWithTheSpecifiedIdDoNotConflictWithGeneratedId() {
-//        Task taskWithGeneratedId = new Task("Задача_1", "Описание_1");
-//        Task taskWithSpecifiedId = new Task("Задача_2", "Описание_2");
-//
-//        taskManager.createTask(taskWithGeneratedId);
-//        taskWithSpecifiedId.setId(4);
-//        taskManager.createTask(taskWithSpecifiedId);
-//
-//        Assertions.assertEquals(taskWithGeneratedId, taskManager.getTaskById(taskWithGeneratedId.getId()));
-//        Assertions.assertEquals(taskWithSpecifiedId, taskManager.getTaskById(taskWithSpecifiedId.getId()));
-//        Assertions.assertNotEquals(taskWithGeneratedId.getId(), taskWithSpecifiedId.getId());
-//    }
-//
-//    @Test
-//    void checkIfTaskUnchangedWhenAddToManager() {
-//        Task task = new Task("Задача_1", "Описание_1");
-//
-//        taskManager.createTask(task);
-//        Task checkedTask = taskManager.getTaskById(task.getId());
-//
-//        Assertions.assertEquals(task.getTitle(), checkedTask.getTitle());
-//        Assertions.assertEquals(task.getDescription(), checkedTask.getDescription());
-//        Assertions.assertEquals(task.getId(), checkedTask.getId());
-//        Assertions.assertEquals(task, checkedTask, "Задачи не равны");
-//    }
-//
-////    @Test
-////    public void createSubtaskWithNonExistentEpic() {
-////        InMemoryTaskManager taskManager = new InMemoryTaskManager();
-////
-////        Subtask subtask = new Subtask("Подзадача", "Описание подзадачи", 1, TaskStatus.NEW, 55);
-////
-////        taskManager.createSubtask(subtask);
-////
-////        assertNull(taskManager.getSubtasksByEpicId(1));
-////    }
-//
-//    @Test
-//    public void createSubtaskWithExistentEpic() {
+//    public void createSubtaskWithNonExistentEpic() {
 //        InMemoryTaskManager taskManager = new InMemoryTaskManager();
 //
-//        Epic epic = new Epic("Эпик", "Описание эпика", 1, TaskStatus.NEW);
-//        taskManager.createEpic(epic);
-//        Subtask subtask = new Subtask("Подзадача", "Описание подзадачи", 2, TaskStatus.NEW, 1);
+//        Subtask subtask = new Subtask("Подзадача", "Описание подзадачи", 1, TaskStatus.NEW, 55);
+//
 //        taskManager.createSubtask(subtask);
 //
-//        assertNotNull(taskManager.getSubtasksByEpicId(1));
+//        assertNull(taskManager.getSubtasksByEpicId(1));
 //    }
-//}
+
+    @Test
+    public void createSubtaskWithExistentEpic() {
+        InMemoryTaskManager taskManager = new InMemoryTaskManager();
+
+        Epic epic = new Epic("Эпик", "Описание эпика", 1, TaskStatus.NEW);
+        taskManager.createEpic(epic);
+        Subtask subtask = new Subtask("Подзадача", "Описание подзадачи", 2, TaskStatus.NEW, 1);
+        taskManager.createSubtask(subtask);
+
+        assertNotNull(taskManager.getSubtasksByEpicId(1));
+    }
+}
 
 
 
