@@ -1,5 +1,3 @@
-import model.Epic;
-import model.Subtask;
 import model.Task;
 import model.TaskStatus;
 import org.junit.jupiter.api.Assertions;
@@ -9,8 +7,6 @@ import service.HistoryManager;
 import service.Managers;
 import service.TaskManager;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class InMemoryHistoryManagerTest {
