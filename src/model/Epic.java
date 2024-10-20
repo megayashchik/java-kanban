@@ -1,11 +1,15 @@
 package model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Epic extends Task {
 
-    private ArrayList<Integer> subtaskIds = new ArrayList<>();
+    private List<Integer> subtaskIds = new ArrayList<>();
+    private LocalDateTime endTime;
 
     public Epic(String title, String description) {
         super(title, description);
@@ -15,12 +19,27 @@ public class Epic extends Task {
         super(title, description, id, status);
     }
 
+    public Epic(String title, String description, int id, TaskStatus status, ArrayList<Integer> subtaskIds,
+                LocalDateTime startTime, LocalDateTime endTime, Duration duration) {
+        super(title, description, id, status, startTime, duration);
+        this.subtaskIds = subtaskIds;
+        this.endTime = endTime;
+    }
+
     public ArrayList<Integer> getSubtaskIds() {
         return new ArrayList<>(subtaskIds);
     }
 
     public TaskType getType() {
         return TaskType.EPIC;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
     @Override
@@ -39,10 +58,22 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return getTitle() + ", " +
-                getDescription() + ", " +
-                getStatus() + ", id " +
-                getId();
+        return super.getTitle()
+                + ", " + super.getDescription()
+                + ",id " + super.getId()
+                + ",статус " + super.getStatus()
+                + "," + subtaskIds
+                + ", начало: " + getStartTimeToString()
+                + ", конец: " + getEndTimeToString()
+                + ", продолжительность: " + super.getDuration();
+    }
+
+    @Override
+    public String getEndTimeToString() {
+        if (endTime == null) {
+            return "null";
+        }
+        return endTime.format(DATE_TIME_FORMATTER);
     }
 
     public void deleteSubtaskId(int id) {
