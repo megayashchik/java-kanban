@@ -9,6 +9,8 @@ import service.HistoryManager;
 import service.Managers;
 import service.TaskManager;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class InMemoryHistoryManagerTest {
@@ -134,8 +136,8 @@ public class InMemoryHistoryManagerTest {
     void removedSubtasks_ShouldNotRetainIds() {
         Epic epic = new Epic("Эпик", "Описание эпика");
         taskManager.createEpic(epic);
-        Subtask subtask1 = new Subtask("Подзадача_1", "Описание подзадачи_1", epic.getId());
-        Subtask subtask2 = new Subtask("Подзадача_2", "Описание подзадачи_2", epic.getId());
+        Subtask subtask1 = new Subtask("Подзадача_1", "Описание подзадачи_1", epic.getId(), LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
+        Subtask subtask2 = new Subtask("Подзадача_2", "Описание подзадачи_2", epic.getId(), LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
 

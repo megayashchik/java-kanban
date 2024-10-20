@@ -10,6 +10,9 @@ import service.InMemoryTaskManager;
 import service.Managers;
 import service.TaskManager;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -131,7 +134,7 @@ class InMemoryTaskManagerTest {
     void createNewSubtask_shouldSaveSubtask() {
         Epic epic = new Epic("Эпик_1", "Описание_1");
         taskManager.createEpic(epic);
-        Subtask subtask = new Subtask("Подзадача_1", "Описание_1", epic.getId());
+        Subtask subtask = new Subtask("Подзадача_1", "Описание_1", epic.getId(), LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
 
         taskManager.createSubtask(subtask);
         Subtask actualSubtask = taskManager.getSubtaskById(subtask.getId());
@@ -144,7 +147,7 @@ class InMemoryTaskManagerTest {
     void updateSubtask_shouldUpdateSubtaskWithSpecifiedTitleAndDescription() {
         Epic epic = new Epic("Эпик_1", "Описание_1");
         taskManager.createEpic(epic);
-        Subtask subtask = new Subtask("Подзадача_1", "Описание_1", epic.getId());
+        Subtask subtask = new Subtask("Подзадача_1", "Описание_1", epic.getId(), LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
 
         taskManager.createSubtask(subtask);
         Subtask savedSubtask = taskManager.getSubtaskById(subtask.getId());
@@ -163,7 +166,7 @@ class InMemoryTaskManagerTest {
     void deleteSubtaskById_shouldDeleteSubtask() {
         Epic epic = new Epic("Эпик_1", "Описание_1");
         taskManager.createEpic(epic);
-        Subtask subtask = new Subtask("Подзадача_1", "Описание_1", epic.getId());
+        Subtask subtask = new Subtask("Подзадача_1", "Описание_1", epic.getId(), LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
 
         taskManager.createSubtask(subtask);
         Subtask actualUpdatedSubtask = taskManager.getSubtaskById(subtask.getId());
@@ -178,8 +181,8 @@ class InMemoryTaskManagerTest {
     void deleteAllSubtasks_shouldDeleteAllSubtasks() {
         Epic epic = new Epic("Эпик_1", "Описание_1");
         taskManager.createEpic(epic);
-        Subtask subtask1 = new Subtask("Подзадача_1", "Описание_1", epic.getId());
-        Subtask subtask2 = new Subtask("Подзадача_2", "Описание_2", epic.getId());
+        Subtask subtask1 = new Subtask("Подзадача_1", "Описание_1", epic.getId(), LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
+        Subtask subtask2 = new Subtask("Подзадача_2", "Описание_2", epic.getId(), LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
 
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
@@ -193,14 +196,14 @@ class InMemoryTaskManagerTest {
     void updateSubtask_shouldUpdateSubtaskWithSpecifiedId() { // изменить на status
         Epic epic = new Epic("Эпик_1", "Описание_1");
         taskManager.createEpic(epic);
-        Subtask subtask = new Subtask("Подзадача_1", "Описание_1", epic.getId());
+        Subtask subtask = new Subtask("Подзадача_1", "Описание_1", epic.getId(), LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
 
         taskManager.createSubtask(subtask);
         subtask.setTitle("Подзадача_1_Updated");
         subtask.setDescription("Описание_1_Updated");
         taskManager.updateSubtask(subtask);
 
-        Subtask expectedUpdatedSubtask = new Subtask("Подзадача_1_Updated", "Описание_1_Updated", subtask.getEpicId());
+        Subtask expectedUpdatedSubtask = new Subtask("Подзадача_1_Updated", "Описание_1_Updated", subtask.getEpicId(), LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
         expectedUpdatedSubtask.setId(subtask.getId());
         Subtask actualUpdatedSubtask = taskManager.getSubtaskById(subtask.getId());
 
@@ -240,7 +243,7 @@ class InMemoryTaskManagerTest {
         Task task = new Task("Задача_1", "Описание_1");
         Epic epic = new Epic("Эпик_1", "Описание_1");
         taskManager.createEpic(epic);
-        Subtask subtask = new Subtask("Подзадача_1", "Описание_1", epic.getId());
+        Subtask subtask = new Subtask("Подзадача_1", "Описание_1", epic.getId(), LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
 
         taskManager.createTask(task);
         taskManager.createSubtask(subtask);

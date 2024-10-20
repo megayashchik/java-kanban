@@ -10,6 +10,8 @@ import service.FileBackedTaskManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -94,8 +96,8 @@ public class FileBackedTaskManagerTest {
     public void shouldSaveAndLoadEpicWithSubtasks() {
         Epic epic = new Epic("Эпик", "Описание эпика");
         manager.createEpic(epic);
-        Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1", epic.getId());
-        Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2", epic.getId());
+        Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1", epic.getId(), LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
+        Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2", epic.getId(), LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
         manager.createSubtask(subtask1);
         manager.createSubtask(subtask2);
 
@@ -112,8 +114,8 @@ public class FileBackedTaskManagerTest {
         Epic epic1 = new Epic("Эпик 1", "Описание эпика 1");
         manager.createEpic(epic1);
 
-        Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1", epic1.getId());
-        Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2", epic1.getId());
+        Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1", epic1.getId(), LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
+        Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2", epic1.getId(), LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
         manager.createSubtask(subtask1);
         manager.createSubtask(subtask2);
 
