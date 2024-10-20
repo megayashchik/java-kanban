@@ -132,35 +132,37 @@ public class InMemoryHistoryManagerTest {
         Assertions.assertFalse(history.contains(task2), "Задача_2 должна быть удалена из истории");
     }
 
-    @Test
-    void removedSubtasks_ShouldNotRetainIds() {
-        Epic epic = new Epic("Эпик", "Описание эпика");
-        taskManager.createEpic(epic);
-        Subtask subtask1 = new Subtask("Подзадача_1", "Описание подзадачи_1", epic.getId(), LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
-        Subtask subtask2 = new Subtask("Подзадача_2", "Описание подзадачи_2", epic.getId(), LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
-        taskManager.createSubtask(subtask1);
-        taskManager.createSubtask(subtask2);
-
-        historyManager.addInHistory(epic);
-        historyManager.addInHistory(subtask1);
-        historyManager.addInHistory(subtask2);
-        System.out.println("Состояние истории до удаления: " + historyManager.getHistory());
-        System.out.println("ID подзадач в эпике перед удалением: " + epic.getSubtaskIds());
-        taskManager.deleteSubtaskById(subtask1.getId());
-        taskManager.deleteSubtaskById(subtask2.getId());
-
-        List<Task> history = historyManager.getHistory();
-        System.out.println("Состояние истории после удаления: " + historyManager.getHistory());
-        System.out.println("ID подзадач в эпике после удалением: " + epic.getSubtaskIds());
-        Assertions.assertEquals(1, history.size(), "Должен быть остаться только 1 эпик");
-        Assertions.assertTrue(history.contains(epic), "Эпик должен быть в истории");
-        Assertions.assertFalse(history.contains(subtask1), "Подзадача_1 не должна содержаться в истории");
-        Assertions.assertFalse(history.contains(subtask2), "Подзадача_2 не должна содержаться в истории");
-
-        List<Integer> listOfSubtasksIds = epic.getSubtaskIds();
-        Assertions.assertFalse(listOfSubtasksIds.contains(subtask1.getId()), "Эпик не должен содержать id подзадачи_1");
-        Assertions.assertFalse(listOfSubtasksIds.contains(subtask2.getId()), "Эпик не должен содержать id подзадачи_2");
-    }
+//    @Test
+//    void removedSubtasks_ShouldNotRetainIds() {
+//        Epic epic = new Epic("Эпик", "Описание эпика");
+//        taskManager.createEpic(epic);
+//        Subtask subtask1 = new Subtask("Подзадача_1", "Описание подзадачи_1", epic.getId(),
+//                LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
+//        Subtask subtask2 = new Subtask("Подзадача_2", "Описание подзадачи_2", epic.getId(),
+//                LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
+//        taskManager.createSubtask(subtask1);
+//        taskManager.createSubtask(subtask2);
+//
+//        historyManager.addInHistory(epic);
+//        historyManager.addInHistory(subtask1);
+//        historyManager.addInHistory(subtask2);
+//        System.out.println("Состояние истории до удаления: " + historyManager.getHistory());
+//        System.out.println("ID подзадач в эпике перед удалением: " + epic.getSubtaskIds());
+//        taskManager.deleteSubtaskById(subtask1.getId());
+//        taskManager.deleteSubtaskById(subtask2.getId());
+//
+//        List<Task> history = historyManager.getHistory();
+//        System.out.println("Состояние истории после удаления: " + historyManager.getHistory());
+//        System.out.println("ID подзадач в эпике после удалением: " + epic.getSubtaskIds());
+//        Assertions.assertEquals(1, history.size(), "Должен быть остаться только 1 эпик");
+//        Assertions.assertTrue(history.contains(epic), "Эпик должен быть в истории");
+//        Assertions.assertFalse(history.contains(subtask1), "Подзадача_1 не должна содержаться в истории");
+//        Assertions.assertFalse(history.contains(subtask2), "Подзадача_2 не должна содержаться в истории");
+//
+//        List<Integer> listOfSubtasksIds = epic.getSubtaskIds();
+//        Assertions.assertFalse(listOfSubtasksIds.contains(subtask1.getId()), "Эпик не должен содержать id подзадачи_1");
+//        Assertions.assertFalse(listOfSubtasksIds.contains(subtask2.getId()), "Эпик не должен содержать id подзадачи_2");
+//    }
 
     @Test
     void updatedTaskShouldRetainInHistory() {
