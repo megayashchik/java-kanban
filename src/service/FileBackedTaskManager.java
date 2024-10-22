@@ -28,54 +28,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             writer.newLine();
 
             for (Task task : getTasks()) {
-                writer.write(tasktoString(task));
+                writer.write(toStringTask(task));
                 writer.newLine();
             }
             for (Epic epic : getEpics()) {
-                writer.write(epicToString(epic) + "\n");
+                writer.write(toStringEpic(epic) + "\n");
                 for (Subtask subtask : getSubtasksByEpicId(epic.getId())) {
-                    writer.write(subtaskToString(subtask) + "\n");
+                    writer.write(toStringSubtask(subtask) + "\n");
                 }
             }
         } catch (IOException e) {
             throw new ManagerSaveException(e.getMessage());
         }
-    }
-
-    public String tasktoString(Task task) {
-        return task.getId() + "," +
-                task.getType() + "," +
-                task.getTitle() + "," +
-                task.getStatus() + "," +
-                task.getDescription() + "," +
-                task.getStartTimeToString() + "," +
-                task.getEndTimeToString() + "," +
-                task.getDuration().toString();
-    }
-
-    private String epicToString(Epic epic) {
-        return epic.getId() + "," +
-                epic.getType() + "," +
-                epic.getTitle() + "," +
-                epic.getStatus() + "," +
-                epic.getDescription() + "," +
-                epic.getSubtaskIds().toString().replace("[", "")
-                        .replace("]", "") + "," +
-                epic.getStartTimeToString() + "," +
-                epic.getEndTimeToString() + "," +
-                epic.getDuration().toString();
-    }
-
-    private String subtaskToString(Subtask subtask) {
-        return subtask.getId() + "," +
-                subtask.getType() + "," +
-                subtask.getTitle() + "," +
-                subtask.getStatus() + "," +
-                subtask.getDescription() + "," +
-                subtask.getEpicId() + "," +
-                subtask.getStartTimeToString() + "," +
-                subtask.getEndTimeToString() + "," +
-                subtask.getDuration().toString();
     }
 
     private static Task fromString(String str) {
@@ -85,6 +49,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String title = part[2];
         TaskStatus status = TaskStatus.valueOf(part[3]);
         String description = part[4];
+        int epicId = Integer.parseInt(part[5]);
 
         LocalDateTime startTime = null;
         if (!part[6].equals("null")) {
@@ -96,7 +61,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             endTime = LocalDateTime.parse(part[7], DATE_TIME_FORMATTER);
         }
 
-        Duration duration = Duration.parse(part[8]);
+        Duration duration = Duration.ofMinutes(Long.parseLong(part[8]));
 
         switch (type) {
             case TASK:
@@ -105,7 +70,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 ArrayList<Integer> subtaskIds = new ArrayList<>();
                 return new Epic(title, description, id, status, subtaskIds, startTime, endTime, duration);
             case SUBTASK:
-                int epicId = Integer.parseInt(part[5]);
                 return new Subtask(title, description, id, status, epicId, startTime, duration);
             default:
                 throw new IllegalStateException("Неправильный тип задачи: " + type + " .Исходная строка: " + str);
@@ -153,6 +117,42 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
         fileBackedTaskManager.id = maxId + 1;
         return fileBackedTaskManager;
+    }
+
+    public String toStringTask(Task task) {
+        return task.getId() + ","
+                + task.getType() + ","
+                + task.getTitle() + ","
+                + task.getStatus() + ","
+                + task.getDescription() + ","
+                + task.getStartTimeToString() + ","
+                + task.getEndTimeToString() + ","
+                + task.getDurationToMinutes();
+    }
+
+    private String toStringEpic(Epic epic) {
+        return epic.getId() + ","
+                + epic.getType() + ","
+                + epic.getTitle() + ","
+                + epic.getStatus() + ","
+                + epic.getDescription() + ","
+                + epic.getSubtaskIds().toString().replace("[", "")
+                .replace("]", "") + ","
+                + epic.getStartTimeToString() + ","
+                + epic.getEndTimeToString() + ","
+                + epic.getDuration().toString();
+    }
+
+    private String toStringSubtask(Subtask subtask) {
+        return subtask.getId() + ","
+                + subtask.getType() + ","
+                + subtask.getTitle() + ","
+                + subtask.getStatus() + ","
+                + subtask.getDescription() + ","
+                + subtask.getEpicId() + ","
+                + subtask.getStartTimeToString() + ","
+                + subtask.getEndTimeToString() + ","
+                + subtask.getDuration().toString();
     }
 
     @Override
@@ -247,9 +247,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         TaskManager taskManager = new FileBackedTaskManager(new File("src/resources/java-kanban.csv"));
 
         Task task1 = new Task("Задача 1", "Описание задачи 1",
-                LocalDateTime.of(2024, 10, 20, 12, 0), Duration.ofMinutes(100));
+                LocalDateTime.of(2024, 10, 20, 10, 0), Duration.ofMinutes(100));
         Task task2 = new Task("Задача 2", "Описание задачи 2",
-                LocalDateTime.of(2024, 10, 20, 15, 0), Duration.ofMinutes(100));
+                LocalDateTime.of(2024, 10, 20, 12, 0), Duration.ofMinutes(100));
         taskManager.createTask(task1);
         taskManager.createTask(task2);
 
@@ -259,9 +259,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1", epic1.getId(),
                 LocalDateTime.of(2024, 10, 20, 14, 0), Duration.ofMinutes(100));
         Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2", epic1.getId(),
-                LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
+                LocalDateTime.of(2024, 10, 20, 16, 30), Duration.ofMinutes(100));
         Subtask subtask3 = new Subtask("Подзадача 3", "Описание подзадачи 3", epic1.getId(),
-                LocalDateTime.of(2024, 10, 20, 15, 10), Duration.ofMinutes(100));
+                LocalDateTime.of(2024, 10, 20, 19, 00), Duration.ofMinutes(100));
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
         taskManager.createSubtask(subtask3);
@@ -269,12 +269,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         System.out.println("\nЗадачи в TaskManager");
         FileBackedTaskManager.printAllTasks(taskManager);
 
-        FileBackedTaskManager fileBackedTaskManager = FileBackedTaskManager.loadFromFile(
-                new File("src/resources/java-kanban.csv"));
-
-        System.out.println("\nПроверка, что все задачи, эпики, подзадачи, которые были в старом менеджере, " +
-                "есть в новом.");
-        FileBackedTaskManager.printAllTasks(fileBackedTaskManager);
+//        FileBackedTaskManager fileBackedTaskManager = FileBackedTaskManager.loadFromFile(
+//                new File("src/resources/java-kanban.csv"));
+//
+//        System.out.println("\nПроверка, что все задачи, эпики, подзадачи, которые были в старом менеджере, " +
+//                "есть в новом.");
+//        FileBackedTaskManager.printAllTasks(fileBackedTaskManager);
 
     }
 }

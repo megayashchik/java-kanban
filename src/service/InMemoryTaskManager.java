@@ -1,5 +1,6 @@
 package service;
 
+import exceptions.ManagerSaveException;
 import model.Epic;
 import model.Subtask;
 import model.Task;
@@ -32,7 +33,8 @@ public class InMemoryTaskManager implements TaskManager {
     public void createTask(Task task) {
         Optional<Task> intersectingTask = checkTimeIntersection(task);
         if (intersectingTask.isPresent()) {
-            System.out.println("Задача пересекается с уже существующей задачей");
+            throw new ManagerSaveException(task.getTitle()
+                    + " пресекается с другой задачей по времени или продолжительности");
         }
         task.setId(generateId());
         tasks.put(task.getId(), task);
@@ -51,7 +53,8 @@ public class InMemoryTaskManager implements TaskManager {
             subtask.setId(generateId());
             Optional<Task> intersectingTask = checkTimeIntersection(subtask);
             if (intersectingTask.isPresent()) {
-                System.out.println("Подзадача пересекается с уже существующей задачей");
+                throw new ManagerSaveException(subtask.getTitle()
+                        + " пресекается с другой задачей по времени или продолжительности");
             }
             epics.get(subtask.getEpicId()).addSubtaskId(subtask.getId());
             subtasks.put(subtask.getId(), subtask);
@@ -233,8 +236,13 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateTask(Task task) { // ver. 2
+    public void updateTask(Task task) {
         if (task != null && tasks.containsKey(task.getId())) {
+            Optional<Task> intersectingTask = checkTimeIntersection(task);
+            if (intersectingTask.isPresent()) {
+                throw new ManagerSaveException("Обновление задачи " + task.getTitle()
+                        + " пересекается по времени с задачей " + intersectingTask.get().getTitle());
+            }
             tasks.put(task.getId(), task);
             if (task.getStartTime() != null) {
                 prioritizedTasks.removeIf(prioritizedTask -> prioritizedTask.getId() == task.getId());
@@ -272,20 +280,32 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private void updateEpicStatus(int id) {
-        int statusNew = 0;
-        int statusDone = 0;
-
-        ArrayList<Integer> subtasksList = epics.get(id).getSubtaskIds();
-        for (Integer taskId : subtasksList) {
-            if (subtasks.get(taskId).getStatus().equals(TaskStatus.DONE)) {
-                statusDone++;
-            } else if (subtasks.get(taskId).getStatus().equals(TaskStatus.NEW)) {
-                statusNew++;
-            }
+        Epic epic = epics.get(id);
+        if (epic == null) {
+            System.out.println("Эпика с id " + id + " не существует.");
+            return;
         }
-        if (subtasksList.size() == statusNew || subtasksList.isEmpty()) {
+
+        List<Integer> subtaskIds = epic.getSubtaskIds();
+        if (subtaskIds.isEmpty()) {
+            epic.setStatus(TaskStatus.NEW);
+            epic.setStartTime(null);
+            epic.setEndTime(null);
+            epic.setDuration(Duration.ZERO);
+            return;
+        }
+
+        Map<TaskStatus, Long> statusCount = epics.get(id).getSubtaskIds().stream()
+                .map(subtasks::get)
+                .collect(Collectors.groupingBy(Subtask::getStatus, Collectors.counting()));
+
+        long statusNew = statusCount.getOrDefault(TaskStatus.NEW, 0L);
+        long statusDone = statusCount.getOrDefault(TaskStatus.DONE, 0L);
+        long total = epics.get(id).getSubtaskIds().size();
+
+        if (total == statusNew || total == 0) {
             epics.get(id).setStatus(TaskStatus.NEW);
-        } else if (subtasksList.size() == statusDone) {
+        } else if (total == statusDone) {
             epics.get(id).setStatus(TaskStatus.DONE);
         } else {
             epics.get(id).setStatus(TaskStatus.IN_PROGRESS);

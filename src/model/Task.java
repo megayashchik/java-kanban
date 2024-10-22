@@ -102,6 +102,9 @@ public class Task {
     }
 
     public LocalDateTime getEndTime() {
+        if (startTime == null) {
+            return null;
+        }
         return startTime.plusMinutes(duration.toMinutes());
     }
 
@@ -118,6 +121,10 @@ public class Task {
 
     public void setDuration(Duration duration) {
         this.duration = duration;
+    }
+
+    public long getDurationToMinutes() {
+        return duration.toMinutes();
     }
 
     @Override
