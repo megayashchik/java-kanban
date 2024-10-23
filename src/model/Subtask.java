@@ -1,23 +1,40 @@
 package model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Subtask extends Task {
 
     private int epicId;
 
+    public Subtask(String title, String description, int epicId, LocalDateTime localDateTime, Duration duration) {
+        super(title, description);
+        this.epicId = epicId;
+    }
+
     public Subtask(String title, String description, int epicId) {
         super(title, description);
         this.epicId = epicId;
     }
 
-    public Subtask(String title, String description, TaskStatus status, int epicId) {
+    public Subtask(String title, String description, int epicId, TaskStatus status) {
         super(title, description, status);
         this.epicId = epicId;
     }
 
     public Subtask(String title, String description, int id, TaskStatus status, int epicId) {
-        super(title, description, id, status);
+        super(title, description, status);
+        this.epicId = epicId;
+    }
+
+    public Subtask(String title, String description, LocalDateTime startTime, Duration duration) {
+        super(title, description, startTime, duration);
+    }
+
+    public Subtask(String title, String description, int id, TaskStatus status, int epicId, LocalDateTime startTime,
+                   Duration duration) {
+        super(title, description, id, status, startTime, duration);
         this.epicId = epicId;
     }
 
@@ -45,9 +62,13 @@ public class Subtask extends Task {
 
     @Override
     public String toString() {
-        return getTitle() + ", " +
-                getDescription() + ", " +
-                getStatus() + ", id эпика " +
-                getEpicId();
+        return super.getTitle()
+                + ", " + super.getDescription()
+                + ", id: " + super.getId()
+                + ", статус:" + super.getStatus()
+                + ", продолжительность: " + super.getDuration()
+                + ", начало: " + super.getStartTimeToString()
+                + ", конец: " + super.getEndTimeToString()
+                + ", epicID: " + epicId;
     }
 }

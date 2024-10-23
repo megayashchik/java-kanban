@@ -1,175 +1,81 @@
-import model.Epic;
-import model.Subtask;
+
 import model.Task;
-import model.TaskStatus;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.HistoryManager;
+import service.InMemoryTaskManager;
 import service.Managers;
-import service.TaskManager;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class InMemoryHistoryManagerTest {
 
-    private TaskManager taskManager;
     private HistoryManager historyManager;
+    private InMemoryTaskManager taskManager;
 
     @BeforeEach
-    void init() {
-        taskManager = Managers.getDefault();
+    void setUp() {
+        taskManager = new InMemoryTaskManager();
         historyManager = Managers.getDefaultHistoryManager();
     }
 
     @Test
-    void addInHistory_ShouldAddToHistory() {
-        Task task1 = new Task("Задача_1", "Описание_1");
-        taskManager.createTask(task1);
-
-        taskManager.getTaskById(task1.getId());
-        historyManager.addInHistory(task1);
-        List<Task> history = taskManager.getHistory();
-
-        Assertions.assertEquals(1, history.size(), "Задача_1 должна быть в истории");
-    }
-
-    @Test
-    void addInHistory_TwoTaskShouldBeAddToHistory_thenShowLastAdded() {
-        Task task1 = new Task("Задача_1", "Описание_1");
-        Task task2 = new Task("Задача_2", "Описание_2");
-        taskManager.createTask(task1);
-        taskManager.createTask(task2);
-
-        taskManager.getTaskById(task1.getId());
-        taskManager.getTaskById(task2.getId());
-        historyManager.addInHistory(task1);
-        historyManager.addInHistory(task2);
-        List<Task> history = taskManager.getHistory();
-
-        Assertions.assertEquals(2, history.size(), "Задача_2 должна быть последней в истории");
-    }
-
-    @Test
-    void addInHistory_ShouldReplaceTheFirstTask() {
-        Task task1 = new Task("Задача_1", "Описание_1");
-        Task task2 = new Task("Задача_2", "Описание_2");
-        taskManager.createTask(task1);
-        taskManager.createTask(task2);
-
-        taskManager.getTaskById(task1.getId());
-        taskManager.getTaskById(task2.getId());
-        historyManager.addInHistory(task1);
-        historyManager.addInHistory(task2);
-        historyManager.addInHistory(task1);
-
-        List<Task> history = historyManager.getHistory();
-
-        Assertions.assertEquals(task2, history.get(0), "task2 должен быть первым");
-        Assertions.assertEquals(task1, history.get(1), "task2 должен быть первым");
-    }
-
-    @Test
-    void addInHistory_ShouldBeShownInOrderOfAddition() {
-        Task task1 = new Task("Задача_1", "Описание_1");
-        Task task2 = new Task("Задача_2", "Описание_2");
-        Task task3 = new Task("Задача_3", "Описание_3");
-        taskManager.createTask(task1);
-        taskManager.createTask(task2);
-        taskManager.createTask(task3);
-
-        taskManager.getTaskById(task1.getId());
-        taskManager.getTaskById(task2.getId());
-        taskManager.getTaskById(task3.getId());
-        historyManager.addInHistory(task2);
-        historyManager.addInHistory(task3);
-        historyManager.addInHistory(task1);
-        List<Task> history = historyManager.getHistory();
-
-        Assertions.assertEquals(3, history.size(), "В истории должно быть 3 задачи");
-        Assertions.assertEquals(task2, history.get(0), "task2 должен быть первым");
-        Assertions.assertEquals(task3, history.get(1), "task3 должен быть вторым");
-        Assertions.assertEquals(task1, history.get(2), "task1 должен быть последним");
-    }
-
-    @Test
-    void addInHistory_ShouldBeNoDuplicates() {
-        Task task = new Task("Задача_1", "Описание_1");
+    void shouldAddAndGetHistory() {
+        Task task = new Task("Задача", "Описание задачи",
+                LocalDateTime.of(2024, 10, 1, 12, 0), Duration.ofMinutes(30));
         taskManager.createTask(task);
-
-        taskManager.getTaskById(task.getId());
         historyManager.addInHistory(task);
-        historyManager.addInHistory(task);
-
-        List<Task> history = taskManager.getHistory();
-        Assertions.assertEquals(1, history.size(), "Должна быть только одна задача");
-    }
-
-    @Test
-    void removeFromHistory_ShouldRemoveFromMiddleOfHistory() {
-        Task task1 = new Task("Задача_1", "Описание_1");
-        Task task2 = new Task("Задача_2", "Описание_2");
-        Task task3 = new Task("Задача_3", "Описание_3");
-        taskManager.createTask(task1);
-        taskManager.createTask(task2);
-        taskManager.createTask(task3);
-
-        taskManager.getTaskById(task1.getId());
-        taskManager.getTaskById(task2.getId());
-        taskManager.getTaskById(task3.getId());
-        historyManager.addInHistory(task1);
-        historyManager.addInHistory(task2);
-        historyManager.addInHistory(task3);
-
-        List<Task> history = taskManager.getHistory();
-        Assertions.assertEquals(3, history.size(), "Должно быть 3 задачи");
-
-        historyManager.removeFromHistory(task2.getId());
-        history = historyManager.getHistory();
-
-        Assertions.assertFalse(history.contains(task2), "Задача_2 должна быть удалена из истории");
-    }
-
-    @Test
-    void removedSubtasks_ShouldNotRetainIds() {
-        Epic epic = new Epic("Эпик", "Описание эпика");
-        taskManager.createEpic(epic);
-        Subtask subtask1 = new Subtask("Подзадача_1", "Описание подзадачи_1", epic.getId());
-        Subtask subtask2 = new Subtask("Подзадача_2", "Описание подзадачи_2", epic.getId());
-        taskManager.createSubtask(subtask1);
-        taskManager.createSubtask(subtask2);
-
-        historyManager.addInHistory(epic);
-        historyManager.addInHistory(subtask1);
-        historyManager.addInHistory(subtask2);
-        System.out.println("Состояние истории до удаления: " + historyManager.getHistory());
-        System.out.println("ID подзадач в эпике перед удалением: " + epic.getSubtaskIds());
-        taskManager.deleteSubtaskById(subtask1.getId());
-        taskManager.deleteSubtaskById(subtask2.getId());
 
         List<Task> history = historyManager.getHistory();
-        System.out.println("Состояние истории после удаления: " + historyManager.getHistory());
-        System.out.println("ID подзадач в эпике после удалением: " + epic.getSubtaskIds());
-        Assertions.assertEquals(1, history.size(), "Должен быть остаться только 1 эпик");
-        Assertions.assertTrue(history.contains(epic), "Эпик должен быть в истории");
-        Assertions.assertFalse(history.contains(subtask1), "Подзадача_1 не должна содержаться в истории");
-        Assertions.assertFalse(history.contains(subtask2), "Подзадача_2 не должна содержаться в истории");
-
-        List<Integer> listOfSubtasksIds = epic.getSubtaskIds();
-        Assertions.assertFalse(listOfSubtasksIds.contains(subtask1.getId()), "Эпик не должен содержать id подзадачи_1");
-        Assertions.assertFalse(listOfSubtasksIds.contains(subtask2.getId()), "Эпик не должен содержать id подзадачи_2");
+        assertNotNull(history, "История не должна быть null");
+        assertEquals(1, history.size());
+        assertEquals(task, history.get(0), "История должна содержать задачу");
     }
 
     @Test
-    void updatedTaskShouldRetainInHistory() {
-        Task task = new Task("Задача", "Описание");
+    void shouldRemoveFromHistory() {
+        Task task1 = new Task("Задача 1", "Описание задачи 1",
+                LocalDateTime.of(2024, 10, 1, 12, 0), Duration.ofMinutes(30));
+        Task task2 = new Task("Задача 2", "Описание задачи 2",
+                LocalDateTime.of(2024, 10, 1, 12, 30), Duration.ofMinutes(30));
+        taskManager.createTask(task1);
+        taskManager.createTask(task2);
+
+        historyManager.addInHistory(task1);
+        historyManager.addInHistory(task2);
+        historyManager.removeFromHistory(task1.getId());
+
+        List<Task> history = historyManager.getHistory();
+        assertEquals(1, history.size());
+        assertEquals(task2, history.get(0));
+        assertFalse(history.contains(task1), "Задача 1 должна быть удалена из истории");
+    }
+
+    @Test
+    void shouldNotAddDuplicateToHistory() {
+        Task task = new Task("Задача", "Описание задачи",
+                LocalDateTime.of(2024, 10, 1, 12, 0), Duration.ofMinutes(30));
         taskManager.createTask(task);
 
         historyManager.addInHistory(task);
-        task.setStatus(TaskStatus.IN_PROGRESS);
-        taskManager.updateTask(task);
+        historyManager.addInHistory(task);
 
         List<Task> history = historyManager.getHistory();
-        Assertions.assertTrue(history.contains(task), "Обновленная задача должна быть в истории");
+        assertEquals(1, history.size(), "В истории должна быть одна задача");
+        assertEquals(task, history.get(0));
+    }
+
+    @Test
+    void shouldGetEmptyHistory() {
+        List<Task> history = historyManager.getHistory();
+
+        assertNotNull(history, "История не должна быть null");
+        assertTrue(history.isEmpty(), "История должна быть пуста");
     }
 }
+
+

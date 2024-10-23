@@ -5,6 +5,9 @@ import model.TaskStatus;
 import service.Managers;
 import service.TaskManager;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Main {
 
     private static void printAllTasks(TaskManager manager) {
@@ -50,9 +53,9 @@ public class Main {
         Epic epic1 = new Epic("Эпик 1", "Описание эпика 1");
         taskManager.createEpic(epic1);
 
-        Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1", epic1.getId());
-        Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2", epic1.getId());
-        Subtask subtask3 = new Subtask("Подзадача 3", "Описание подзадачи 3", epic1.getId());
+        Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1", epic1.getId(), LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
+        Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2", epic1.getId(), LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
+        Subtask subtask3 = new Subtask("Подзадача 3", "Описание подзадачи 3", epic1.getId(), LocalDateTime.of(2024, 10, 20, 14, 30), Duration.ofMinutes(100));
 
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
