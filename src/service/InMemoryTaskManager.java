@@ -333,17 +333,17 @@ public class InMemoryTaskManager implements TaskManager {
         } else if (statusDone == subtaskList.size()) {
             epic.setStatus(TaskStatus.DONE);
         } else {
-            epic.setStatus(TaskStatus.NEW); // проверить ещё
+            epic.setStatus(TaskStatus.NEW);
         }
 
         LocalDateTime startTime = subtaskList.stream()
                 .map(Subtask::getStartTime)
-                .filter(Objects::nonNull) // изменено
+                .filter(Objects::nonNull)
                 .min(LocalDateTime::compareTo)
                 .orElse(null);
         LocalDateTime endTime = subtaskList.stream()
                 .map(Subtask::getEndTime)
-                .filter(Objects::nonNull) // изменено
+                .filter(Objects::nonNull)
                 .max(LocalDateTime::compareTo)
                 .orElse(null);
         Duration duration = subtaskList.stream()

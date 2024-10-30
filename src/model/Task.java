@@ -40,6 +40,14 @@ public class Task {
         this.duration = duration;
     }
 
+    public Task(String title, String description, TaskStatus status, Duration duration, LocalDateTime startTime) {
+        this.title = title;
+        this.description = description;
+        this.status = status;
+        this.duration = duration;
+        this.startTime = startTime;
+    }
+
     public Task(String title, String description, int id, TaskStatus status, LocalDateTime startTime,
                 Duration duration) {
         this.title = title;
@@ -49,6 +57,8 @@ public class Task {
         this.startTime = startTime;
         this.duration = duration;
     }
+
+
 
     public int getId() {
         return id;
