@@ -41,7 +41,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
         String[] parts = path.split("/");
 
         if (parts.length != 3) {
-            sendNotFoundResponse(exchange, "Неверный путь " + path);
+            sendNotFoundResponse(exchange, "Неверный путь " + path + ".");
             return;
         }
 
@@ -81,7 +81,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
     private void handleCreateEpic(HttpExchange exchange, Epic epic) throws IOException {
         try {
             taskManager.createEpic(epic);
-            sendCreatedResponse(exchange, "Эпик создан");
+            sendCreatedResponse(exchange, "Эпик " + epic.getTitle() + " создан c id " + epic.getId() + ".");
         } catch (ManagerSaveException | IOException e) {
             sendInternalServerErrorResponse(exchange, "Задача не создана.");
         }

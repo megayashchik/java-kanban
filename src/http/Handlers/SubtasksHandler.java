@@ -39,7 +39,7 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
         String path = exchange.getRequestURI().getPath();
         String[] parts = path.split("/");
 
-        if (parts.length != 4) {
+        if (parts.length != 3) {
             sendNotFoundResponse(exchange, "Неверный путь " + path);
             return;
         }
@@ -62,7 +62,8 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
     private void handleCreateSubtask(HttpExchange exchange, Subtask subtask) throws IOException {
         try {
             taskManager.createSubtask(subtask);
-            sendCreatedResponse(exchange, "Подзадача создана.");
+            sendCreatedResponse(exchange, "Подзадача " + subtask.getTitle()
+                    + " создана с id " + subtask.getId() + ".");
         } catch (ManagerSaveException | IOException e) {
             sendInternalServerErrorResponse(exchange, "Подзадача не создана.");
         }
@@ -108,9 +109,9 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
         switch (requestMethod) {
             case "GET":
                 if (parts.length == 3 && "subtasks".equals(parts[1])) {
-                    handlerGetSubtasks(exchange);
-                } else if (parts.length == 4 && "subtasks".equals(parts[1])) {
                     handlerGetSubtaskById(exchange);
+                } else if (parts.length == 2 && "subtasks".equals(parts[1])) {
+                    handlerGetSubtasks(exchange);
                 } else {
                     sendNotFoundResponse(exchange, "Неверный путь.");
                 }
@@ -120,6 +121,10 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
                 if (newSubtask != null) {
                     handleCreateSubtask(exchange, newSubtask);
                 }
+                break;
+            case "PUT":
+                Subtask subtaskToUpdate = getSubtaskFromRequestBody(exchange);
+                handleUpdateSubtask(exchange, subtaskToUpdate);
                 break;
             case "DELETE":
                 handleDeleteSubtaskById(exchange);

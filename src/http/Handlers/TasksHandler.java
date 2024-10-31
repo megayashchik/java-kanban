@@ -7,7 +7,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import exceptions.ManagerSaveException;
 import model.Task;
-import model.TaskStatus;
 import service.TaskManager;
 
 import java.io.IOException;
@@ -39,9 +38,8 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
         String path = exchange.getRequestURI().getPath();
         String[] parts = path.split("/");
 
-        if (parts.length == 3) {
-            System.out.println("Неверный путь: " + path);
-            sendNotFoundResponse(exchange, "неверный путь");
+        if (parts.length != 3) {
+            sendNotFoundResponse(exchange, "Неверный путь " + path + ".");
             return;
         }
 
@@ -61,21 +59,17 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
 
     private void handleCreateTask(HttpExchange exchange, Task task) throws IOException {
         try {
-            task.setStatus(TaskStatus.NEW);
             taskManager.createTask(task);
-            sendCreatedResponse(exchange, "Задача создана.");
+            sendCreatedResponse(exchange, "Задача " + task.getTitle() + " создана c id " + task.getId() + ".");
         } catch (ManagerSaveException | IOException e) {
             sendInternalServerErrorResponse(exchange, "Задача не создана.");
         }
     }
 
     private void handleUpdateTask(HttpExchange exchange, Task task) throws IOException {
-        String requestBody = new String(exchange.getRequestBody().readAllBytes());
-        Task taskToUpdate = gson.fromJson(requestBody, Task.class);
-
         try {
-            taskManager.updateTask(taskToUpdate);
-            sendOkResponse(exchange, "Задача " + taskToUpdate.getId() + " обновлена.");
+            taskManager.updateTask(task);
+            sendOkResponse(exchange, "Задача " + task.getId() + " обновлена.");
         } catch (Exception e) {
             System.out.println("Ошибка обновления задачи.");
             sendHasInteractionsResponse(exchange, e.getMessage());
@@ -83,16 +77,21 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleDeleteTaskById(HttpExchange exchange) throws IOException {
-        String requestUri = exchange.getRequestURI().toString();
-        String[] uriParts = requestUri.split("/");
-        if (uriParts.length != 3) {
-            sendNotFoundResponse(exchange, "Не верный запрос.");
+        String path = exchange.getRequestURI().getPath();
+        String[] parts = path.split("/");
+
+        if (parts.length != 3) {
+            sendNotFoundResponse(exchange, "Не верный путь" + path + ".");
             return;
         }
 
         try {
-            String taskIdString = uriParts[2];
+            String taskIdString = parts[2];
             int taskId = Integer.parseInt(taskIdString);
+            if (taskManager.getTaskById(taskId) == null) {
+                sendNotFoundResponse(exchange, "Задача с id " + taskId + " не найдена.");
+                return;
+            }
             taskManager.deleteTaskById(taskId);
             sendOkResponse(exchange, "Задача удалена.");
         } catch (Exception e) {
@@ -107,10 +106,12 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
 
         switch (requestMethod) {
             case "GET":
-                if (parts.length == 2) {
+                if (parts.length == 2 && path.equals("/tasks")) {
+                    handleGetTasks(exchange);
+                } else if (parts.length == 3 && path.startsWith("/tasks/")) {
                     handleGetTaskById(exchange);
                 } else {
-                    handleGetTasks(exchange);
+                    sendNotFoundResponse(exchange, "Неверный путь " + path + ".");
                 }
                 break;
             case "POST":
@@ -119,7 +120,11 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
                 break;
             case "PUT":
                 Task taskToUpdate = getTaskFromRequestBody(exchange);
-                handleUpdateTask(exchange, taskToUpdate);
+                if (taskManager.getTaskById(taskToUpdate.getId()) != null) {
+                    handleUpdateTask(exchange, taskToUpdate);
+                } else {
+                    sendNotFoundResponse(exchange, "Задача с id " + taskToUpdate.getId() + " не найдена.");
+                }
                 break;
             case "DELETE":
                 handleDeleteTaskById(exchange);
