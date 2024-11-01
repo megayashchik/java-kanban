@@ -226,57 +226,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         super.deleteAllSubtasks();
         save();
     }
-
-    private static void printAllTasks(TaskManager manager) {
-        System.out.println("Задачи:");
-        for (Task task : manager.getTasks()) {
-            System.out.println(task);
-        }
-        System.out.println("Эпики:");
-        for (Task epic : manager.getEpics()) {
-            System.out.println(epic);
-
-            for (Task task : manager.getSubtasksByEpicId(epic.getId())) {
-                System.out.println("--> " + task);
-            }
-        }
-    }
-
-    public static void main(String[] args) {
-
-        TaskManager taskManager = new FileBackedTaskManager(new File("src/resources/java-kanban.csv"));
-
-        Task task1 = new Task("Задача 1", "Описание задачи 1",
-                LocalDateTime.of(2024, 10, 20, 10, 0), Duration.ofMinutes(100));
-        Task task2 = new Task("Задача 2", "Описание задачи 2",
-                LocalDateTime.of(2024, 10, 20, 12, 0), Duration.ofMinutes(100));
-        taskManager.createTask(task1);
-        taskManager.createTask(task2);
-
-        Epic epic1 = new Epic("Эпик 1", "Описание эпика 1");
-        taskManager.createEpic(epic1);
-
-        Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1", epic1.getId(),
-                LocalDateTime.of(2024, 10, 20, 14, 0), Duration.ofMinutes(100));
-        Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2", epic1.getId(),
-                LocalDateTime.of(2024, 10, 20, 16, 30), Duration.ofMinutes(100));
-        Subtask subtask3 = new Subtask("Подзадача 3", "Описание подзадачи 3", epic1.getId(),
-                LocalDateTime.of(2024, 10, 20, 19, 00), Duration.ofMinutes(100));
-        taskManager.createSubtask(subtask1);
-        taskManager.createSubtask(subtask2);
-        taskManager.createSubtask(subtask3);
-
-        System.out.println("\nЗадачи в TaskManager");
-        FileBackedTaskManager.printAllTasks(taskManager);
-
-//        FileBackedTaskManager fileBackedTaskManager = FileBackedTaskManager.loadFromFile(
-//                new File("src/resources/java-kanban.csv"));
-//
-//        System.out.println("\nПроверка, что все задачи, эпики, подзадачи, которые были в старом менеджере, " +
-//                "есть в новом.");
-//        FileBackedTaskManager.printAllTasks(fileBackedTaskManager);
-
-    }
 }
 
 
